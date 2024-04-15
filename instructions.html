@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>p5.js and Firebase Integration Guide</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+            color: #333;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 5px;
+            display: block;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            padding: 10px;
+            overflow-x: auto;
+        }
+        h1, h2 {
+            color: #444;
+        }
+        a {
+            color: teal;
+        }
+        .container {
+            width: 95%;
+            max-width: 800px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>p5.js and Firebase Integration Guide</h1>
+    <p>This guide provides instructions on how to create a p5.js sketch that uses Firebase for user authentication with Google and data management.</p>
+
+    <p>You should be familiar with Firebase before trying this. <a href="https://www.youtube.com/watch?v=JrHT1iqSrAQ&t=142s">The Coding Train has a great video series! Please watch. </a>
+        And here is your own working example of how the below code fits together. I had to make this outside the p5 editor because of permissions issues, so welcome to GitHub!
+    </p>
+    <h2>Step 1: Setup Firebase Project</h2>
+    <ol>
+        <li>Go to the <a href="https://console.firebase.google.com/">Firebase Console</a> and create a new project.</li>
+        <li>Add a web app to your Firebase project.</li>
+        <li>Enable authentication methods in Firebase under the Authentication tab. Specifically, enable Google authentication.</li>
+        <li>Set up Firebase Realtime Database with appropriate security rules.</li>
+    </ol>
+
+    <h2>Step 2: Include Firebase SDKs</h2>
+    <pre><code>&lt;script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"&gt;&lt;/script&gt;
+&lt;script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-auth.js"&gt;&lt;/script&gt;
+&lt;script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"&gt;&lt;/script&gt;</code></pre>
+
+    <h2>Step 3: Initialize Firebase in Your Code</h2>
+    <pre><code>var firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    databaseURL: "YOUR_DATABASE_URL",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);</code></pre>
+
+    <h2>Step 4: Authenticate Users</h2>
+    <p>Use Google sign-in to authenticate users. Add a sign-in button and use the following code to handle authentication:</p>
+    <pre><code>function signInWithGoogle() {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+        // User signed in
+    }).catch(function(error) {
+        // Handle Errors here.
+        console.log(error.message);
+    });
+}</code></pre>
+
+    <h2>Step 5: Save Data to Firebase</h2>
+    <p>Once authenticated, allow users to save data. Here is a simple example to save user comments:</p>
+    <pre><code>function saveComment() {
+    var comment = document.getElementById('comment').value; // Get comment from a text input
+    var userId = firebase.auth().currentUser.uid;
+    firebase.database().ref('users/' + userId + '/comments').push({
+        comment: comment
+    });
+}</code></pre>
+
+    <h2>Step 6: Fetch and Display Data</h2>
+    <p>Fetch comments from Firebase and display them randomly on the canvas:</p>
+    <pre><code>function fetchComments() {
+    var commentsRef = firebase.database().ref('comments');
+    commentsRef.on('value', (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+            var comment = childSnapshot.val().comment;
+            // Display comments on the canvas
+        });
+    });
+}</code></pre>
+
+    <p>For more detailed steps and configuration, please refer to the official <a href="https://firebase.google.com/docs">Firebase Documentation</a>.</p>
+</div>
+</body>
+</html>
